@@ -1,0 +1,71 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "Components/StaticMeshComponent.h"
+#include "ShipTestWithAI.h"
+#include "Weapon.h"
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "AITurret.generated.h"
+
+UCLASS()
+class LEVELCONCEPT_API AAITurret : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this actor's properties
+	AAITurret();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+private:
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	//Variables that can be set in the editor
+	UPROPERTY(EditAnywhere)
+		USceneComponent* SceneComponent;
+	//allows the mesh for the turret to be added anywhere in the project
+	UPROPERTY(EditAnywhere)
+		UStaticMeshComponent* TurretMesh;
+		FRotator rotationRate;
+	//allows the turret range of the turret to be eddited anywhere in the project
+	UPROPERTY(EditAnywhere)
+		float turretRange;//maximum distance the turret can shoot
+	UPROPERTY(EditAnywhere)
+		float health;  //the health of the turret
+	UPROPERTY(EditAnywhere)
+		int teamToAttack; //the team the turret should attack
+	UPROPERTY(EditAnywhere)
+		int timeToTakeOverTurret; //the amount of seconds it takes to take over the turret
+
+	//varibles
+	AWeapon* weapon; //the weapon the turret will use
+	AShipTestWithAI* target; // turrets ship target
+	bool idle; // true of the turret isnt attacking a ship
+	bool disabled; //if the turret has been disabled by the enemy
+	bool beingTaken;//if the turret is  being taken by the enemy
+	bool callTimer;
+	bool turretIsNeutral;//if the turret isnt targeting anyone
+	int teamTakingTurret;//the id of the team taking the turret
+	int capturePointDelay;//how long has the player been taking over the turret
+	int currentllyAttackingTeam;// the team the turret is currentlly targeting
+	FTimerHandle CapturePointDelayTimer; //time for the capture point delay
+
+
+	//functions
+	void reduseCapturePointDelay(); //reduces the capture point timer
+	void increasseCapturePointDelay();// increseses the capture point timer
+	//fucntion that the team taking over the turret calls to start the take over process
+	void takeOverTurret(bool takingTurret_, int team_);
+	void FindTarget(float timeDelta_);//finds the closest target
+	void AttackTarget();//attacks the target
+	void DisableTurret();//disables the turret and makes it stop attacking and wait
+	void TurretIdle(float timeDelta_);//makes the turret idle and rotate
+	bool CheckIfTargetStillInRange();//checks to see if the turret target is still in range
+	//checks to see if the turret target is hitable and not behind a wall
+	bool CheckIfTargetIsHitable(FVector direction);
+};
